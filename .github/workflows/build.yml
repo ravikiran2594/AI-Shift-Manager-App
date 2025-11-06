@@ -1,0 +1,27 @@
+name: Build Kivy APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip openjdk-17-jdk zip
+          pip install buildozer cython
+
+      - name: Build APK
+        run: |
+          buildozer init
+          sed -i 's/source.main = main/source.main = main/' buildozer.spec
+          sed -i 's/requirements = python3/requirements = python3,kivy,pandas/' buildozer.spec
+          sed -i 's/# (str) Android permissions/\
+android.permissions = android.permission.INTERNET/' buildozer.spec
+          buildozer android debug
