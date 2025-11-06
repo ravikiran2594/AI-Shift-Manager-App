@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = AI Shift Manager
 
 # (str) Package name
-package.name = myapp
+package.name = aishiftmanager
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = org.ravikiran.kivy
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -408,7 +408,7 @@ ios.codesign.allowed = false
 log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
-warn_on_root = 1
+warn_on_root = 0
 
 # (str) Path to build artifact storage, absolute or relative to spec file
 # build_dir = ./.buildozer
