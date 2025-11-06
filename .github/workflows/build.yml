@@ -20,22 +20,16 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk unzip
+          sudo apt install -y python3-pip openjdk-17-jdk unzip git
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Accept Android SDK Licenses
+      - name: Prepare Environment
         run: |
-          yes | sdkmanager --licenses || true
+          mkdir -p ~/.buildozer/android/platform
+          echo "sdk.dir=$HOME/.buildozer/android/platform/android-sdk" > local.properties
 
-      - name: Install Android SDK Components
-        run: |
-          yes | sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;36.1.0"
-
-      - name: Build APK
+      - name: Build APK (Debug)
         run: |
           buildozer android debug
 
