@@ -3,37 +3,44 @@ name: Build Kivy APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install system dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip python3-setuptools zip unzip openjdk-17-jdk
-          python3 -m pip install --upgrade pip
-
-      - name: Install buildozer toolchain
-        run: |
+          sudo apt install -y python3-pip openjdk-17-jdk unzip
+          pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Build APK (debug)
+      - name: Accept Android SDK Licenses
         run: |
-          buildozer -v android debug
+          yes | sdkmanager --licenses || true
 
-      - name: Rename APK file
+      - name: Install Android SDK Components
         run: |
-          mkdir -p bin
-          mv bin/*.apk bin/AI-Shift-Manager.apk || true
+          yes | sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;36.1.0"
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
         with:
           name: AI-Shift-Manager-APK
-          path: bin/AI-Shift-Manager.apk
+          path: bin/*.apk
