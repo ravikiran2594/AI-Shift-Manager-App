@@ -3,25 +3,37 @@ name: Build Kivy APK
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Set up dependencies
+      - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip openjdk-17-jdk zip
+          sudo apt install -y python3-pip python3-setuptools zip unzip openjdk-17-jdk
+          python3 -m pip install --upgrade pip
+
+      - name: Install buildozer toolchain
+        run: |
           pip install buildozer cython
 
-      - name: Build APK
+      - name: Build APK (debug)
         run: |
-          buildozer init
-          sed -i 's/source.main = main/source.main = main/' buildozer.spec
-          sed -i 's/requirements = python3/requirements = python3,kivy,pandas/' buildozer.spec
-          sed -i 's/# (str) Android permissions/\
-android.permissions = android.permission.INTERNET/' buildozer.spec
-          buildozer android debug
+          buildozer -v android debug
+
+      - name: Rename APK file
+        run: |
+          mkdir -p bin
+          mv bin/*.apk bin/AI-Shift-Manager.apk || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Shift-Manager-APK
+          path: bin/AI-Shift-Manager.apk
